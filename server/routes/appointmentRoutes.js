@@ -21,4 +21,10 @@ router.put(
   appointmentsController.cancelAppointment
 );
 
+router.put(
+  "/appointment/appointments/:id/reschedule",
+  authenticateToken,
+  appointmentsController.rescheduleAppointment
+);
+
 module.exports = router;

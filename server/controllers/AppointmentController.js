@@ -219,3 +219,47 @@ exports.cancelAppointment = async (req, res) => {
     return res.status(500).json({ message: "Server Error" });
   }
 };
+
+// Reschedule an appointment
+exports.rescheduleAppointment = async (req, res) => {
+  const { id } = req.params;
+  const { appointment_datetime } = req.body;
+  
+  try {
+    const appointment = await Appointment.findByPk(id);
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Check if the new time conflicts with existing appointments for the same doctor
+    const conflict = await Appointment.findOne({
+      where: {
+        doctor_id: appointment.doctor_id,
+        appointment_datetime: appointment_datetime,
+        id: { [Op.ne]: id },
+        status_id: {
+          [Op.notIn]: [
+            // Get cancelled status ID
+            (await AppointmentStatus.findOne({ where: { status: "Cancelled" } }))?.id
+          ].filter(Boolean)
+        }
+      }
+    });
+
+    if (conflict) {
+      return res.status(400).json({ message: "Time slot is already booked" });
+    }
+
+    // Update appointment datetime
+    appointment.appointment_datetime = appointment_datetime;
+    await appointment.save();
+    
+    return res.json({ 
+      message: "Appointment rescheduled successfully", 
+      appointment: appointment 
+    });
+  } catch (error) {
+    console.error("Error rescheduling appointment:", error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
