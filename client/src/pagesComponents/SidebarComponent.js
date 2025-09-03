@@ -13,6 +13,7 @@ import {
 import { HiViewBoards } from "react-icons/hi";
 import { GrSchedule } from "react-icons/gr";
 import { IoSettings, IoLogOut } from "react-icons/io5";
+import { MessageCircle } from "lucide-react";
 
 function SidebarComponent({ onItemClick }) {
   const handleItemClick = (pageComponent) => {
@@ -50,6 +51,13 @@ function SidebarComponent({ onItemClick }) {
             onClick={() => handleItemClick("Scheduling")}
           >
             Scheduling
+          </Sidebar.Item>
+          <Sidebar.Item
+            href="/Dashboard/Chat"
+            icon={MessageCircle}
+            onClick={() => handleItemClick("Chat")}
+          >
+            Messages
           </Sidebar.Item>
           <Sidebar.Item
             href="/Dashboard/History"
